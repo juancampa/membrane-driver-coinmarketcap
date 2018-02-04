@@ -1,0 +1,11 @@
+{
+  "name": "coinmarketcap",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:juancampa/membrane-driver-coinmarketcap.git",
+  "author": "Juan Campa <juancampa@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.17.1"
+  }
+}

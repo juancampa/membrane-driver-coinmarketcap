@@ -1,5 +1,6 @@
 import { root } from './schema';
 import * as client from './client';
+import { parse as parseUrl } from 'url';
 import symbols from './symbols';
 
 export const init = () => {
@@ -11,6 +12,14 @@ export const parse = ({ name, value }) => {
     case 'symbol': {
       return root.currencies.one({ id: symbols[value] });
     }
+    case 'url': {
+      const { pathname: path } = parseUrl(value, true);
+      const parts = path.split('/');
+      if (parts.length >= 3) {
+        return root.currencies.one({ id: parts[2] });
+      }
+      break;
+    }
   }
 }
 
@@ -19,9 +28,23 @@ export const CurrencyCollection = {
     const result = await client.get(`/ticker/${args.id}`);
     return result[0];
   },
-  async items() {
-    return client.get(`/ticker/`);
+
+  async page({ self, args }) {
+    // Get the items in this page
+    let query = { limit: args.pageSize || 100, start: args.start || 0 };
+    const items = await client.get(`/ticker/`, query);
+
+    // Compute a ref to the next page
+    const start = (args.start || 0) + items.length;
+    const next = root.currencies.page({ ...args, start })
+
+    return { items, next }
   },
+
+  async count() {
+    const result = await client.get(`/global/`);
+    return result.active_currencies + result.active_assets;
+  }
 }
 
 export const Currency = {

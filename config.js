@@ -1,9 +1,8 @@
 const { dependencies, endpoints, environment, expressions, imports, schema } = program;
 
-program.name = 'coinmarketcap';
-
 expressions
   .add('symbol', '^[A-Z]{3,5}$')
+  .add('url', '^https://coinmarketcap.com/currencies/.*$')
 
 schema.type('Root')
   .field('currencies', 'CurrencyCollection')
@@ -11,7 +10,14 @@ schema.type('Root')
 schema.type('CurrencyCollection')
   .computed('one', 'Currency')
     .param('id', 'String')
-  .computed('items', '[Currency]')
+  .computed('page', 'CurrencyPage')
+    .param('start', 'Int')
+    .param('pageSize', 'Int')
+  .computed('count', 'Int')
+
+schema.type('CurrencyPage')
+  .field('next', 'CurrencyPage*')
+  .field('items', '[Currency]')
 
 schema.type('Currency')
   .computed('self', 'Currency*')
