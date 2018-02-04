@@ -1,7 +1,8 @@
-import { root } from './schema';
 import * as client from './client';
 import { parse as parseUrl } from 'url';
 import symbols from './symbols';
+
+const { root } = program.refs;
 
 export const init = () => {
   return root.set({ currencies: {} });
